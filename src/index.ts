@@ -6,20 +6,23 @@ import * as path from 'path';
 import * as shell from 'shelljs';
 import * as template from './utils/template';
 import chalk from 'chalk';
+import * as yargs from 'yargs';
 
 const CHOICES = fs.readdirSync(path.join(__dirname, 'templates'));
 
 const QUESTIONS = [
   {
-    name: 'project-choice',
+    name: 'template',
     type: 'list',
     message: 'What project template would you like to generate?',
-    choices: CHOICES
+    choices: CHOICES,
+    when: () => !yargs.argv['template']
   },
   {
-    name: 'project-name',
+    name: 'name',
     type: 'input',
     message: 'Project name:',
+    when: () => !yargs.argv['name'],
     validate: (input: string) => {
       if (/^([A-Za-z\-\_\d])+$/.test(input)) return true;
       else return 'Project name may only include letters, numbers, underscores and hashes.';
@@ -44,8 +47,11 @@ export interface CliOptions {
 
 inquirer.prompt(QUESTIONS)
   .then(answers => {
-    const projectChoice = answers['project-choice'];
-    const projectName = answers['project-name'];
+
+    answers = Object.assign({}, answers, yargs.argv);
+
+    const projectChoice = answers['template'];
+    const projectName = answers['name'];
     const templatePath = path.join(__dirname, 'templates', projectChoice);
     const tartgetPath = path.join(CURR_DIR, projectName);
     const templateConfig = getTemplateConfig(templatePath);
