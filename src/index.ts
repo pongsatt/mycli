@@ -72,18 +72,18 @@ inquirer.prompt(QUESTIONS)
   });
 
 function showMessage(options: CliOptions) {
-  var ui = new inquirer.ui.BottomBar();
-  ui.write(chalk.green('Done.\n'));
-  ui.write(chalk.green(`Go into the project: cd ${options.projectName}\n`));
+  console.log('');
+  console.log(chalk.green('Done.'));
+  console.log(chalk.green(`Go into the project: cd ${options.projectName}`));
 
   const message = options.config.postMessage;
 
   if (message) {
-    ui.write('\n');
-    ui.write(chalk.yellow(message));
+    console.log('');
+    console.log(chalk.yellow(message));
+    console.log('');
   }
 
-  ui.close();
 }
 
 function getTemplateConfig(templatePath: string): TemplateConfig {
