@@ -50,7 +50,7 @@ inquirer.prompt(QUESTIONS)
     const tartgetPath = path.join(CURR_DIR, projectName);
     const templateConfig = getTemplateConfig(templatePath);
 
-    const options : CliOptions = {
+    const options: CliOptions = {
       projectName,
       templateName: projectChoice,
       templatePath,
@@ -58,9 +58,16 @@ inquirer.prompt(QUESTIONS)
       config: templateConfig
     }
 
-    createProject(tartgetPath);
+    if (!createProject(tartgetPath)) {
+      return;
+    }
+
     createDirectoryContents(templatePath, projectName, templateConfig);
-    postProcess(options);
+
+    if (!postProcess(options)) {
+      return;
+    }
+
     showMessage(options);
   });
 
@@ -95,16 +102,19 @@ function getTemplateConfig(templatePath: string): TemplateConfig {
 
 function createProject(projectPath: string) {
   if (fs.existsSync(projectPath)) {
-    throw `${projectPath} exists. Please delete first.`;
+    console.log(chalk.red(`Folder ${projectPath} exists. Delete or use another name.`));
+    return false;
   }
 
   fs.mkdirSync(projectPath);
+  return true;
 }
 
 function postProcess(options: CliOptions) {
   if (isNode(options)) {
-    postProcessNode(options);
+    return postProcessNode(options);
   }
+  return true;
 }
 
 function isNode(options: CliOptions) {
@@ -114,13 +124,25 @@ function isNode(options: CliOptions) {
 function postProcessNode(options: CliOptions) {
   shell.cd(options.tartgetPath);
 
+  let cmd = '';
+
   if (shell.which('yarn')) {
-    shell.exec('yarn');
-  } else if (shell.which('npm')){
-    shell.exec('npm install');
-  } else {
-    console.log('No yarn or npm found. Cannot run installation.');
+    cmd = 'yarn';
+  } else if (shell.which('npm')) {
+    cmd = 'npm install';
   }
+
+  if (cmd) {
+    const result = shell.exec(cmd);
+
+    if (result.code !== 0) {
+      return false;
+    }
+  } else {
+    console.log(chalk.red('No yarn or npm found. Cannot run installation.'));
+  }
+
+  return true;
 }
 
 const SKIP_FILES = ['node_modules', '.template.json'];
@@ -139,7 +161,7 @@ function createDirectoryContents(templatePath: string, projectName: string, conf
     if (stats.isFile()) {
       let contents = fs.readFileSync(origFilePath, 'utf8');
 
-      contents = template.render(contents, {projectName});
+      contents = template.render(contents, { projectName });
 
       const writePath = path.join(CURR_DIR, projectName, file);
       fs.writeFileSync(writePath, contents, 'utf8');
