@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "ts-node src/index.ts",
-    "build": "tsc && rimraf dist/templates && cp -r templates dist"
+    "build": "tsc && shx rm -rf dist/templates && shx cp -r templates dist"
   },
   "bin": {
     "mycli": "./dist/index.js"
@@ -15,7 +15,7 @@
     "@types/inquirer": "^0.0.43",
     "@types/node": "^10.9.4",
     "@types/shelljs": "^0.8.0",
-    "rimraf": "^2.6.2",
+    "shx": "^0.3.2",
     "ts-node": "^7.0.1",
     "typescript": "^3.0.3"
   },
