@@ -68,7 +68,7 @@ inquirer.prompt(QUESTIONS)
       return;
     }
 
-    createDirectoryContents(templatePath, projectName, templateConfig);
+    createDirectoryContents(templatePath, projectName, projectName, templateConfig);
 
     if (!postProcess(options)) {
       return;
@@ -153,7 +153,7 @@ function postProcessNode(options: CliOptions) {
 
 const SKIP_FILES = ['node_modules', '.template.json'];
 
-function createDirectoryContents(templatePath: string, projectName: string, config: TemplateConfig) {
+function createDirectoryContents(templatePath: string, currentPath:string, projectName: string, config: TemplateConfig) {
   const filesToCreate = fs.readdirSync(templatePath);
 
   filesToCreate.forEach(file => {
@@ -175,7 +175,7 @@ function createDirectoryContents(templatePath: string, projectName: string, conf
       fs.mkdirSync(path.join(CURR_DIR, projectName, file));
 
       // recursive call
-      createDirectoryContents(path.join(templatePath, file), path.join(projectName, file), config);
+      createDirectoryContents(path.join(templatePath, file), path.join(currentPath, file), projectName, config);
     }
   });
 }
