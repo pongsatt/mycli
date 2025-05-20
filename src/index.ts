@@ -41,7 +41,7 @@ export interface CliOptions {
   projectName: string
   templateName: string
   templatePath: string
-  tartgetPath: string
+  targetPath: string
   config: TemplateConfig
 }
 
@@ -53,18 +53,18 @@ inquirer.prompt(QUESTIONS)
     const projectChoice = answers['template'];
     const projectName = answers['name'];
     const templatePath = path.join(__dirname, 'templates', projectChoice);
-    const tartgetPath = path.join(CURR_DIR, projectName);
+    const targetPath = path.join(CURR_DIR, projectName);
     const templateConfig = getTemplateConfig(templatePath);
 
     const options: CliOptions = {
       projectName,
       templateName: projectChoice,
       templatePath,
-      tartgetPath,
+      targetPath,
       config: templateConfig
     }
 
-    if (!createProject(tartgetPath)) {
+    if (!createProject(targetPath)) {
       return;
     }
 
@@ -128,7 +128,7 @@ function isNode(options: CliOptions) {
 }
 
 function postProcessNode(options: CliOptions) {
-  shell.cd(options.tartgetPath);
+  shell.cd(options.targetPath);
 
   let cmd = '';
 
